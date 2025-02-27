@@ -1,9 +1,26 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import "./app.css";
 
 function App() {
   const [isBoxVisible, setIsBoxVisible] = useState(false);
   const [boxPosition, setBoxPosition] = useState({ x: 0, y: 0 });
+  const boxRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if(boxRef.current && !boxRef.current.contains(event.target) && isBoxVisible) {
+        setIsBoxVisible(false);
+      }
+    };
+
+    if(isBoxVisible) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isBoxVisible]);
 
   const handleShowBox = (e) => {
     e.preventDefault();
@@ -31,6 +48,7 @@ function App() {
 
       {isBoxVisible && (
         <div
+          ref={boxRef}
           className='box'
           style={{
             top: boxPosition.y + "px",
