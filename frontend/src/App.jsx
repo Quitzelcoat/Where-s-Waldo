@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import "./app.css";
 
 function App() {
@@ -6,42 +6,31 @@ function App() {
   const [boxPosition, setBoxPosition] = useState({ x: 0, y: 0 });
   const boxRef = useRef(null);
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if(boxRef.current && !boxRef.current.contains(event.target) && isBoxVisible) {
-        setIsBoxVisible(false);
-      }
-    };
+  const handleToggleBox = (e) => {
+    e.preventDefault();
+
+    e.stopPropagation();
 
     if(isBoxVisible) {
-      document.addEventListener("mousedown", handleClickOutside);
+      setIsBoxVisible(false);
+    } else {
+      const rect = e.target.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      setBoxPosition({ x, y });
+      setIsBoxVisible(true);
     }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [isBoxVisible]);
-
-  const handleShowBox = (e) => {
-    e.preventDefault();
-
-    const rect = e.target.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    setBoxPosition({ x, y });
-    setIsBoxVisible(true);
-  };
+  }
 
   const handleCloseBox = (e) => {
-    e.preventDefault();
+    e.stopPropagation();
     setIsBoxVisible(false);
-  };
+  }
 
   return (
     <>
-      <div className='img-container'>
-        <div className='photo' onClick={handleShowBox}>
+      <div className='img-container' onClick={handleToggleBox}>
+        <div className='photo'>
           <img src='./beach.jpg' alt='Find Waldo' className='photo-img' />
         </div>
       </div>
@@ -54,6 +43,7 @@ function App() {
             top: boxPosition.y + "px",
             left: boxPosition.x + "px",
           }}
+          onClick={(e) => e.stopPropagation()}
         >
           <div className='box-content'>
             <h2>Insert Character</h2>
