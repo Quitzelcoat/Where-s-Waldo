@@ -12,10 +12,12 @@ const characters = {
   'Beach Dog': { x: 0.64, y: 0.27, tolerance: 0.05 },
 };
 
+// server running
 app.get('/', (req, res) => {
   res.send('Hello World it is running');
 });
 
+// send the characters to frontend for display.
 app.post('/validate', (req, res) => {
   const { character, x, y } = req.body;
 
@@ -40,6 +42,7 @@ app.post('/validate', (req, res) => {
   }
 });
 
+// server port
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () =>
   console.log(`Server running on http://localhost:${PORT}`)
