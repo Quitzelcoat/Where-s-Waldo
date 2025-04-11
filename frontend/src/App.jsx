@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
-import axios from 'axios';
+import ImageDisplay from './components/ImgDisplay';
+import { validateClick } from './services/coordinatesApi';
 import './app.css';
 
 function App() {
@@ -20,8 +21,6 @@ function App() {
   const boxRef = useRef(null);
   const imgRef = useRef(null);
 
-  // const characters = ['Red Shorts Guy', 'Briefcase Lady', 'Beach Dog'];
-
   // Close the box when clicking outside of it
   const handleToggleBox = (e) => {
     e.preventDefault();
@@ -29,6 +28,7 @@ function App() {
 
     if (isBoxVisible) {
       setIsBoxVisible(false);
+      setMessage('');
     } else {
       if (!imgRef.current) return;
       const rect = e.target.getBoundingClientRect();
@@ -54,21 +54,23 @@ function App() {
     const normalizedY = boxPosition.y / rect.height;
 
     try {
-      const response = await axios.post('http://localhost:3000/validate', {
-        character: selectedCharacter,
-        x: normalizedX,
-        y: normalizedY,
-      });
-      setMessage(response.data.message);
+      const response = await validateClick(
+        selectedCharacter,
+        normalizedX,
+        normalizedY
+      );
+      setMessage(response.message);
 
-      if (response.data.success) {
+      if (response.success) {
         setAvailableCharacters((prevChar) =>
           prevChar.filter((char) => char !== selectedCharacter)
         );
-        setSelectedCharacter('');
       }
+      setSelectedCharacter('');
     } catch (error) {
       setMessage('An error occurred', error);
+      setSelectedCharacter('');
+      console.error('Error validating click:', error);
     }
 
     setIsBoxVisible(false);
@@ -77,16 +79,7 @@ function App() {
   return (
     <>
       {/* image display */}
-      <div className="img-container" onClick={handleToggleBox}>
-        <div className="photo">
-          <img
-            ref={imgRef}
-            src="./beach.jpg"
-            alt="Find Waldo"
-            className="photo-img"
-          />
-        </div>
-      </div>
+      <ImageDisplay imgRef={imgRef} OnImageClick={handleToggleBox} />
 
       {/* box display */}
       {isBoxVisible && (
