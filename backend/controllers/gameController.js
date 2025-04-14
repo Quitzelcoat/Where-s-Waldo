@@ -1,21 +1,28 @@
+const prisma = require('../db/prismaClient');
+
 const characters = {
   'Red Shorts Guy': { x: 0.78, y: 0.16, tolerance: 0.05 },
   'Briefcase Lady': { x: 0.43, y: 0.85, tolerance: 0.05 },
   'Beach Dog': { x: 0.64, y: 0.27, tolerance: 0.05 },
 };
 
-const validateCharacter = (req, res) => {
+const validateCharacter = async (req, res) => {
   const { character, x, y } = req.body;
 
   if (!character || typeof x !== 'number' || typeof y !== 'number') {
-    res.status(400).send('Invalid request');
-    return;
+    return res
+      .status(400)
+      .json({ success: false, message: 'Invalid request data.' });
   }
 
-  const target = characters[character];
+  const target = await prisma.character.findUnique({
+    where: { name: character },
+  });
+
   if (!target) {
-    res.status(404).send('Character not found');
-    return;
+    return res
+      .status(404)
+      .json({ success: false, message: 'Character not found.' });
   }
 
   const withinX = Math.abs(x - target.x) <= target.tolerance;
