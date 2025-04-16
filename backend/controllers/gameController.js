@@ -1,11 +1,5 @@
 const prisma = require('../db/prismaClient');
 
-const characters = {
-  'Red Shorts Guy': { x: 0.78, y: 0.16, tolerance: 0.05 },
-  'Briefcase Lady': { x: 0.43, y: 0.85, tolerance: 0.05 },
-  'Beach Dog': { x: 0.64, y: 0.27, tolerance: 0.05 },
-};
-
 const validateCharacter = async (req, res) => {
   const { character, x, y } = req.body;
 
