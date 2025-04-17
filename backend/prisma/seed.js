@@ -7,11 +7,15 @@ async function main() {
     { name: 'Beach Dog', x: 0.64, y: 0.27, tolerance: 0.05 },
   ];
 
-  for (const character of characters) {
-    await prisma.character.create({ data: character });
+  for (const data of characters) {
+    await prisma.character.upsert({
+      where: { name: data.name },
+      update: {},
+      create: data,
+    });
   }
 
-  console.log('Seeding completed successfully.');
+  console.log('Seeding completed.');
 }
 
 main()

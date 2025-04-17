@@ -18,6 +18,6 @@ model Character {
 model HighScore {
   id        Int      @id @default(autoincrement())
   name      String
-  score     Float //Time in seconds
+  time      Int
   createdAt DateTime @default(now())
 }
