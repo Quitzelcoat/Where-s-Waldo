@@ -1,6 +1,10 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import ImageDisplay from './ImgDisplay';
 import TargetBox from './TargetBox';
+
+import Timer from './Timer';
+import HighScore from './HighScore';
+
 import { validateClick } from '../services/coordinatesApi';
 
 const GameBoard = () => {
@@ -17,6 +21,11 @@ const GameBoard = () => {
     'Beach Dog',
   ]);
 
+  const [gameStarted, setGameStarted] = useState(false);
+  const [gameFinished, setGameFinished] = useState(false);
+  const [elapseTime, setElapseTime] = useState(0);
+  const [showModal, setShowModal] = useState(false);
+
   // Ref for the target box and the image
   const imgRef = useRef(null);
 
@@ -24,6 +33,10 @@ const GameBoard = () => {
   const handleImageClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
+
+    if (!gameStarted) {
+      setGameStarted(true);
+    }
 
     if (isBoxVisible) {
       setIsBoxVisible(false);
@@ -33,6 +46,7 @@ const GameBoard = () => {
       const rect = e.target.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
+
       setBoxPosition({ x, y });
       setIsBoxVisible(true);
       setMessage('');
@@ -46,8 +60,8 @@ const GameBoard = () => {
     }
 
     if (!imgRef.current) return;
-    const rect = imgRef.current.getBoundingClientRect();
 
+    const rect = imgRef.current.getBoundingClientRect();
     const normalizedX = position.x / rect.width;
     const normalizedY = position.y / rect.height;
 
@@ -66,16 +80,27 @@ const GameBoard = () => {
       }
       setSelectedCharacter('');
     } catch (error) {
-      setMessage('An error occurred', error);
       console.error('Error validating click:', error);
+      setMessage('An error occurred', error);
       setSelectedCharacter('');
     }
 
     setIsBoxVisible(false);
   };
 
+  useEffect(() => {
+    if (gameStarted && availableCharacters.length === 0) {
+      setGameFinished(true);
+      setShowModal(true);
+    }
+  }, [availableCharacters, gameStarted]);
+
   return (
     <>
+      {gameStarted && !gameFinished && (
+        <Timer start={gameStarted} onTick={setElapseTime} />
+      )}
+
       {/* image display */}
       <ImageDisplay imgRef={imgRef} OnImageClick={handleImageClick} />
 
@@ -91,6 +116,14 @@ const GameBoard = () => {
       )}
 
       {message && <div className="message">{message}</div>}
+
+      {showModal && (
+        <HighScore
+          score={elapseTime}
+          onClose={() => setShowModal(false)}
+          onSaved={() => {}}
+        />
+      )}
     </>
   );
 };

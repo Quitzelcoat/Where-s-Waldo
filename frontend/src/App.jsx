@@ -1,12 +1,24 @@
+// src/App.jsx
+import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom';
 import GameBoard from './components/GameBoard';
+import Leaderboard from './components/Leaderboard';
 import './app.css';
 
-function App() {
+export default function App() {
   return (
-    <>
-      <GameBoard />
-    </>
+    <BrowserRouter>
+      <nav>
+        <NavLink to="/" end>
+          Play
+        </NavLink>
+        {' | '}
+        <NavLink to="/leaderboard">Leaderboard</NavLink>
+      </nav>
+
+      <Routes>
+        <Route path="/" element={<GameBoard />} />
+        <Route path="/leaderboard" element={<Leaderboard />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
-
-export default App;
