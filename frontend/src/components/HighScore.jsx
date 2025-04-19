@@ -1,19 +1,22 @@
 /* eslint-disable react/prop-types */
 import { useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const HighScore = ({ score, onClose, onSaved }) => {
   const [name, setName] = useState('');
+  const navigate = useNavigate();
 
   const save = async (e) => {
     e.preventDefault();
     if (!name) return;
-    const res = await axios.post('http://localhost:3000/scores', {
+    const res = await axios.post('http://localhost:3000/score', {
       name,
       time: score,
     });
     onSaved && onSaved(res.data);
     onClose();
+    navigate('/leaderboard');
   };
 
   return (

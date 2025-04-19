@@ -1,7 +1,7 @@
 const prisma = require('../db/prismaClient');
 
 const getLeaderboard = async (req, res) => {
-  const scores = await prisma.score.findMany({
+  const scores = await prisma.highScore.findMany({
     orderBy: { time: 'asc' },
     take: 10,
   });
@@ -13,7 +13,7 @@ const postScore = async (req, res) => {
   if (!name || typeof time !== 'number') {
     return res.status(400).json({ error: 'Invalid data' });
   }
-  const newScore = await prisma.score.create({
+  const newScore = await prisma.highScore.create({
     data: { name, time },
   });
   res.json(newScore);
